@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Spline from "@splinetool/react-spline";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Mail, Lock, Eye, EyeOff, X, User } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 function isWebGLAvailable() {
@@ -40,7 +40,6 @@ export default function Hero() {
   const navigate = useNavigate();
   const { login, register } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showLoginModal, setShowLoginModal] = useState(false);
@@ -60,7 +59,8 @@ export default function Hero() {
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
-    setCanUseWebGL(isWebGLAvailable());
+    const glAvailable = isWebGLAvailable();
+    setCanUseWebGL(glAvailable);
     const checkDesktop = () => {
       setIsDesktop(window.innerWidth >= 1024);
     };
@@ -169,14 +169,17 @@ export default function Hero() {
       className="relative w-full min-h-screen overflow-hidden bg-black"
     >
       {/* Background layers */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 z-0">
         {canUseWebGL ? (
-          <div className="absolute inset-0">
-            <Spline scene="https://prod.spline.design/UiMDkOJtlS5O5Vaz/scene.splinecode" />
+          <div className="absolute inset-0 w-full h-full">
+            <Spline 
+              scene="https://prod.spline.design/UiMDkOJtlS5O5Vaz/scene.splinecode" 
+              className="w-full h-full"
+            />
           </div>
         ) : (
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 w-full h-full"
             style={{
               background:
                 "radial-gradient(1200px 800px at 10% 10%, rgba(0,212,255,0.15), transparent 60%), radial-gradient(1000px 700px at 90% 20%, rgba(0,255,136,0.12), transparent 60%), radial-gradient(900px 900px at 50% 100%, rgba(88,101,242,0.18), transparent 60%), linear-gradient(180deg, #05060a 0%, #070a12 100%)",
@@ -380,461 +383,224 @@ export default function Hero() {
         </motion.div>
       </div>
 
-      {/* Login Modal */}
-      {showLoginModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(0, 0, 0, 0.6)", backdropFilter: "blur(8px)" }}
-          onClick={() => toggleModal(false, "login")}
-        >
+      {/* Modals */}
+      <AnimatePresence>
+        {showLoginModal && (
           <div
-            className="relative w-full max-w-md p-6 sm:p-8 rounded-2xl sm:rounded-3xl max-h-[90vh] overflow-y-auto"
-            style={{
-              background: "rgba(10, 12, 18, 0.9)",
-              border: "1.5px solid rgba(0, 212, 255, 0.3)",
-              backdropFilter: "blur(30px)",
-              boxShadow: "0 30px 100px rgba(0, 212, 255, 0.25)",
-            }}
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: "rgba(0, 0, 0, 0.6)", backdropFilter: "blur(8px)" }}
+            onClick={() => toggleModal(false, "login")}
           >
-            <button
-              onClick={() => toggleModal(false, "login")}
-              className="absolute top-4 sm:top-5 right-4 sm:right-5 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer"
-            >
-              <X size={22} />
-            </button>
-
-            <h3
-              className="text-xl sm:text-2xl md:text-3xl font-black mb-2 select-none"
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-md p-6 sm:p-8 rounded-2xl sm:rounded-3xl max-h-[90vh] overflow-y-auto"
               style={{
-                background: "linear-gradient(90deg, #00d4ff 0%, #00ff88 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
+                background: "rgba(10, 12, 18, 0.9)",
+                border: "1.5px solid rgba(0, 212, 255, 0.3)",
+                backdropFilter: "blur(30px)",
+                boxShadow: "0 30px 100px rgba(0, 212, 255, 0.25)",
               }}
+              onClick={(e) => e.stopPropagation()}
             >
-              Start Your Learning
-            </h3>
-            <p className="text-gray-400 text-sm font-normal mb-6 sm:mb-8 select-none">
-              Sign in to your student account
-            </p>
-
-            <form className="space-y-5 sm:space-y-6" onSubmit={handleLogin}>
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2 select-none">
-                  Username or Email
-                </label>
-                <div className="relative">
-                  <Mail
-                    size={18}
-                    className="absolute left-4 top-1/2 -translate-y-1/2"
-                    style={{ color: "#00d4ff" }}
-                  />
-                  <input
-                    type="text"
-                    value={emailOrUsername}
-                    onChange={(e) => setEmailOrUsername(e.target.value)}
-                    placeholder="Enter your username or email"
-                    className="w-full pl-12 pr-4 py-3 sm:py-3.5 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none transition-all duration-300"
-                    style={{
-                      background: "rgba(255, 255, 255, 0.04)",
-                      border: "1px solid rgba(0, 212, 255, 0.2)",
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2 select-none">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock
-                    size={18}
-                    className="absolute left-4 top-1/2 -translate-y-1/2"
-                    style={{ color: "#00ff88" }}
-                  />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    className="w-full pl-12 pr-12 py-3 sm:py-3.5 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none transition-all duration-300"
-                    style={{
-                      background: "rgba(255, 255, 255, 0.04)",
-                      border: "1px solid rgba(0, 212, 255, 0.2)",
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer"
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-              </div>
-
-              {loginError && (
-                <div
-                  className="text-red-300 text-sm mt-3 p-3 rounded-md"
-                  style={{
-                    background: "rgba(255, 107, 107, 0.12)",
-                    border: "1px solid rgba(255, 107, 107, 0.3)",
-                  }}
-                >
-                  {loginError}
-                </div>
-              )}
-
               <button
-                type="submit"
-                className="w-full py-3.5 sm:py-4 rounded-lg font-black text-base text-white transition-all duration-500 cursor-pointer uppercase"
-                style={{
-                  background: "linear-gradient(135deg, #5865f2 0%, #7289da 100%)",
-                  boxShadow: "0 10px 40px rgba(88, 101, 242, 0.85)",
-                  letterSpacing: "0.5px",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background =
-                    "linear-gradient(135deg, #7289da, #5865f2)";
-                  e.currentTarget.style.transform = "translateY(-5px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 15px 60px rgba(88, 101, 242, 1)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background =
-                    "linear-gradient(135deg, #5865f2 0%, #7289da 100%)";
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow =
-                    "0 10px 40px rgba(88, 101, 242, 0.85)";
-                }}
+                onClick={() => toggleModal(false, "login")}
+                className="absolute top-4 sm:top-5 right-4 sm:right-5 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer"
               >
-                Login
+                <X size={22} />
               </button>
-            </form>
 
-            <div className="relative my-5 sm:my-6">
-              <div
-                className="w-full border-t"
-                style={{ borderColor: "rgba(255, 255, 255, 0.1)" }}
-              ></div>
-              <div className="absolute inset-0 flex justify-center text-xs">
-                <span
-                  className="px-3"
-                  style={{
-                    background: "rgba(10, 12, 18, 0.9)",
-                    color: "#b9bbbe",
-                  }}
+              <h3 className="text-xl sm:text-2xl font-black mb-2 bg-gradient-to-r from-cyan-400 to-green-400 bg-clip-text text-transparent">
+                Start Your Learning
+              </h3>
+              <p className="text-gray-400 text-sm mb-6">Sign in to your student account</p>
+
+              <form className="space-y-5" onSubmit={handleLogin}>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-200 mb-2">Username or Email</label>
+                  <div className="relative">
+                    <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-400" />
+                    <input
+                      type="text"
+                      value={emailOrUsername}
+                      onChange={(e) => setEmailOrUsername(e.target.value)}
+                      placeholder="Enter your username or email"
+                      className="w-full pl-12 pr-4 py-3 rounded-lg text-sm text-white bg-white/5 border border-cyan-500/20 focus:outline-none focus:border-cyan-500/50"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-200 mb-2">Password</label>
+                  <div className="relative">
+                    <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-green-400" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      className="w-full pl-12 pr-12 py-3 rounded-lg text-sm text-white bg-white/5 border border-cyan-500/20 focus:outline-none focus:border-cyan-500/50"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                </div>
+
+                {loginError && <p className="text-red-400 text-xs">{loginError}</p>}
+
+                <button
+                  type="submit"
+                  className="w-full py-3.5 rounded-lg font-black text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-500/20 uppercase text-sm tracking-widest"
                 >
-                  OR
-                </span>
+                  Login
+                </button>
+              </form>
+
+              <div className="mt-6 text-center text-sm">
+                <span className="text-gray-400">Don't have an account? </span>
+                <button
+                  onClick={() => { setShowLoginModal(false); setShowSignupModal(true); }}
+                  className="text-cyan-400 font-bold hover:underline"
+                >
+                  Sign up here
+                </button>
               </div>
-            </div>
-
-            <div className="text-center text-sm select-none">
-              <span className="text-gray-400">Don't have an account? </span>
-              <button
-                onClick={() => {
-                  setShowLoginModal(false);
-                  setShowSignupModal(true);
-                }}
-                className="font-semibold transition-colors hover:text-cyan-300 cursor-pointer"
-                style={{ color: "#00d4ff", background: "none", border: "none" }}
-              >
-                Sign up here
-              </button>
-            </div>
-
-            
-              
-            </div>
+            </motion.div>
           </div>
-        
-      )}
+        )}
 
-      {/* Signup Modal */}
-      {showSignupModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(0, 0, 0, 0.6)", backdropFilter: "blur(8px)" }}
-          onClick={() => toggleModal(false, "signup")}
-        >
+        {showSignupModal && (
           <div
-            className="relative w-full max-w-md p-6 sm:p-8 rounded-2xl sm:rounded-3xl max-h-[90vh] overflow-y-auto"
-            style={{
-              background: "rgba(10, 12, 18, 0.9)",
-              border: "1.5px solid rgba(0, 212, 255, 0.3)",
-              backdropFilter: "blur(30px)",
-              boxShadow: "0 30px 100px rgba(0, 212, 255, 0.25)",
-            }}
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: "rgba(0, 0, 0, 0.6)", backdropFilter: "blur(8px)" }}
+            onClick={() => toggleModal(false, "signup")}
           >
-            <button
-              onClick={() => toggleModal(false, "signup")}
-              className="absolute top-4 sm:top-5 right-4 sm:right-5 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer"
-            >
-              <X size={22} />
-            </button>
-
-            <h3
-              className="text-xl sm:text-2xl md:text-3xl font-black mb-2 select-none"
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-md p-6 sm:p-8 rounded-2xl sm:rounded-3xl max-h-[90vh] overflow-y-auto"
               style={{
-                background: "linear-gradient(90deg, #00d4ff 0%, #00ff88 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
+                background: "rgba(10, 12, 18, 0.9)",
+                border: "1.5px solid rgba(0, 212, 255, 0.3)",
+                backdropFilter: "blur(30px)",
+                boxShadow: "0 30px 100px rgba(0, 212, 255, 0.25)",
               }}
+              onClick={(e) => e.stopPropagation()}
             >
-              Create Your Account
-            </h3>
-            <p className="text-gray-400 text-sm font-normal mb-6 sm:mb-8 select-none">
-              Join SHIKARA LAB for better learning
-            </p>
-
-            {signupSuccess && (
-              <div
-                className="text-emerald-300 text-sm mb-4 p-3 rounded-md"
-                style={{
-                  background: "rgba(81, 207, 102, 0.12)",
-                  border: "1px solid rgba(81, 207, 102, 0.35)",
-                }}
-              >
-                {signupSuccess}
-              </div>
-            )}
-
-            <form className="space-y-4 sm:space-y-5" onSubmit={handleSignup}>
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2 select-none">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <User
-                    size={18}
-                    className="absolute left-4 top-1/2 -translate-y-1/2"
-                    style={{ color: "#00d4ff" }}
-                  />
-                  <input
-                    type="text"
-                    value={signupData.fullName}
-                    onChange={(e) =>
-                      setSignupData({ ...signupData, fullName: e.target.value })
-                    }
-                    placeholder="Enter your full name"
-                    className="w-full pl-12 pr-4 py-3 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none"
-                    style={{
-                      background: "rgba(255, 255, 255, 0.04)",
-                      border: "1px solid rgba(0, 212, 255, 0.2)",
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2 select-none">
-                  Student ID
-                </label>
-                <input
-                  type="text"
-                  value={signupData.studentId}
-                  onChange={(e) =>
-                    setSignupData({ ...signupData, studentId: e.target.value })
-                  }
-                  placeholder="Enter your student ID"
-                  className="w-full px-4 py-3 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.04)",
-                    border: "1px solid rgba(0, 212, 255, 0.2)",
-                  }}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2 select-none">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  value={signupData.email}
-                  onChange={(e) =>
-                    setSignupData({ ...signupData, email: e.target.value })
-                  }
-                  placeholder="Enter your email"
-                  className="w-full px-4 py-3 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.04)",
-                    border: "1px solid rgba(0, 212, 255, 0.2)",
-                  }}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2 select-none">
-                  Select class
-                </label>
-                <select
-                  value={signupData.classLevel}
-                  onChange={(e) =>
-                    setSignupData({ ...signupData, classLevel: e.target.value })
-                  }
-                  className="w-full px-4 py-3 rounded-lg text-sm text-black focus:outline-none"
-                  style={{
-                    background: "rgb(255, 255, 255)",
-                    border: "1px solid rgba(0, 212, 255, 0.2)",
-                  }}
-                >
-                  <option value="" disabled>
-                    Choose an option
-                  </option>
-                  <option value="primary">Primary (1-5)</option>
-                  <option value="middle">Middle (6-8)</option>
-                  <option value="secondary">Secondary (9-10)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2 select-none">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock
-                    size={18}
-                    className="absolute left-4 top-1/2 -translate-y-1/2"
-                    style={{ color: "#00ff88" }}
-                  />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={signupData.password}
-                    onChange={(e) =>
-                      setSignupData({ ...signupData, password: e.target.value })
-                    }
-                    placeholder="Enter your password"
-                    className="w-full pl-12 pr-12 py-3 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none"
-                    style={{
-                      background: "rgba(255, 255, 255, 0.04)",
-                      border: "1px solid rgba(0, 212, 255, 0.2)",
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer"
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2 select-none">
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <Lock
-                    size={18}
-                    className="absolute left-4 top-1/2 -translate-y-1/2"
-                    style={{ color: "#00ff88" }}
-                  />
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={signupData.confirmPassword}
-                    onChange={(e) =>
-                      setSignupData({
-                        ...signupData,
-                        confirmPassword: e.target.value,
-                      })
-                    }
-                    placeholder="Confirm your password"
-                    className="w-full pl-12 pr-12 py-3 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none"
-                    style={{
-                      background: "rgba(255, 255, 255, 0.04)",
-                      border: "1px solid rgba(0, 212, 255, 0.2)",
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer"
-                  >
-                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-              </div>
-
-              {signupError && (
-                <div
-                  className="text-red-300 text-sm mt-1 p-3 rounded-md"
-                  style={{
-                    background: "rgba(255, 107, 107, 0.12)",
-                    border: "1px solid rgba(255, 107, 107, 0.3)",
-                  }}
-                >
-                  {signupError}
-                </div>
-              )}
-
               <button
-                type="submit"
-                className="w-full py-3.5 sm:py-4 rounded-lg font-black text-base text-black transition-all duration-500 cursor-pointer uppercase select-none"
-                style={{
-                  background: "linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)",
-                  boxShadow: "0 10px 40px rgba(0, 212, 255, 0.8)",
-                  letterSpacing: "0.5px",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background =
-                    "linear-gradient(135deg, #00ff88, #00d4ff)";
-                  e.currentTarget.style.transform = "translateY(-5px)";
-                  e.currentTarget.style.boxShadow =
-                    "0 15px 60px rgba(0, 255, 136, 1)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background =
-                    "linear-gradient(135deg, #00d4ff 0%, #00ff88 100%)";
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow =
-                    "0 10px 40px rgba(0, 212, 255, 0.8)";
-                }}
+                onClick={() => toggleModal(false, "signup")}
+                className="absolute top-4 sm:top-5 right-4 sm:right-5 text-gray-400 hover:text-gray-200 transition-colors cursor-pointer"
               >
+                <X size={22} />
+              </button>
+
+              <h3 className="text-xl sm:text-2xl font-black mb-2 bg-gradient-to-r from-cyan-400 to-green-400 bg-clip-text text-transparent">
                 Create Account
-              </button>
-            </form>
+              </h3>
+              <p className="text-gray-400 text-sm mb-6">Join SHIKARA LAB for better learning</p>
 
-            <div className="relative my-5 sm:my-6">
-              <div
-                className="w-full border-t"
-                style={{ borderColor: "rgba(255, 255, 255, 0.1)" }}
-              ></div>
-              <div className="absolute inset-0 flex justify-center text-xs select-none">
-                <span
-                  className="px-3"
-                  style={{
-                    background: "rgba(10, 12, 18, 0.9)",
-                    color: "#b9bbbe",
-                  }}
+              {signupSuccess && <p className="text-green-400 text-sm mb-4">{signupSuccess}</p>}
+
+              <form className="space-y-4" onSubmit={handleSignup}>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Full Name</label>
+                    <input
+                      type="text"
+                      value={signupData.fullName}
+                      onChange={(e) => setSignupData({ ...signupData, fullName: e.target.value })}
+                      placeholder="Ahmed Adnan"
+                      className="w-full px-4 py-2.5 rounded-lg text-xs text-white bg-white/5 border border-cyan-500/20 focus:outline-none focus:border-cyan-500/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Student ID</label>
+                    <input
+                      type="text"
+                      value={signupData.studentId}
+                      onChange={(e) => setSignupData({ ...signupData, studentId: e.target.value })}
+                      placeholder="S12345"
+                      className="w-full px-4 py-2.5 rounded-lg text-xs text-white bg-white/5 border border-cyan-500/20 focus:outline-none focus:border-cyan-500/50"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Email</label>
+                  <input
+                    type="email"
+                    value={signupData.email}
+                    onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
+                    placeholder="ahmed@gmail.com"
+                    className="w-full px-4 py-2.5 rounded-lg text-xs text-white bg-white/5 border border-cyan-500/20 focus:outline-none focus:border-cyan-500/50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Class</label>
+                  <select
+                    value={signupData.classLevel}
+                    onChange={(e) => setSignupData({ ...signupData, classLevel: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-lg text-xs text-white bg-black border border-cyan-500/20 focus:outline-none focus:border-cyan-500/50"
+                  >
+                    <option value="" disabled>Choose an option</option>
+                    <option value="primary">Primary (1-5)</option>
+                    <option value="middle">Middle (6-8)</option>
+                    <option value="secondary">Secondary (9-10)</option>
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Password</label>
+                    <input
+                      type="password"
+                      value={signupData.password}
+                      onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-lg text-xs text-white bg-white/5 border border-cyan-500/20 focus:outline-none focus:border-cyan-500/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Confirm</label>
+                    <input
+                      type="password"
+                      value={signupData.confirmPassword}
+                      onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })}
+                      className="w-full px-4 py-2.5 rounded-lg text-xs text-white bg-white/5 border border-cyan-500/20 focus:outline-none focus:border-cyan-500/50"
+                    />
+                  </div>
+                </div>
+
+                {signupError && <p className="text-red-400 text-[10px]">{signupError}</p>}
+
+                <button
+                  type="submit"
+                  className="w-full py-3.5 mt-2 rounded-lg font-black text-black bg-gradient-to-r from-cyan-400 to-green-400 hover:from-cyan-300 hover:to-green-300 uppercase text-xs tracking-widest"
                 >
-                  OR
-                </span>
-              </div>
-            </div>
+                  Create Account
+                </button>
+              </form>
 
-            <div className="text-center text-sm select-none">
-              <span className="text-gray-400">Already have an account? </span>
-              <button
-                onClick={() => {
-                  setShowSignupModal(false);
-                  setShowLoginModal(true);
-                }}
-                className="font-semibold transition-colors hover:text-cyan-300 cursor-pointer"
-                style={{ color: "#00d4ff", background: "none", border: "none" }}
-              >
-                Login here
-              </button>
-            </div>
+              <div className="mt-4 text-center text-xs">
+                <span className="text-gray-400">Already have an account? </span>
+                <button
+                  onClick={() => { setShowSignupModal(false); setShowLoginModal(true); }}
+                  className="text-cyan-400 font-bold hover:underline"
+                >
+                  Login here
+                </button>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </section>
   );
 }
@@ -856,7 +622,7 @@ function AnimatedWords({ words }: { words: string[] }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="select-none"
+      className="select-none inline-block"
     >
       {words[index]}
     </motion.span>

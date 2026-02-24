@@ -800,7 +800,7 @@ export default function FaradaySimulation() {
   };
 
   return (
-    <div className={`min-h-screen font-sans transition-colors duration-300 ${darkMode ? "bg-slate-900" : "bg-slate-50"}`}>
+    <div className={` mt-8 min-h-screen font-sans transition-colors duration-300 ${darkMode ? "bg-slate-900" : "bg-slate-50"}`}>
       {/* Header */}
       <header className={`sticky top-0 z-50 px-4 md:px-8 h-16 flex items-center justify-between ${darkMode ? "bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500" : "bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400"} shadow-lg`}>
         <div className="flex items-center gap-3">

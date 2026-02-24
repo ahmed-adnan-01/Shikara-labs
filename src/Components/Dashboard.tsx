@@ -18,12 +18,10 @@ export default function Dashboard() {
   };
 
   if (!user) {
-    navigate('/');
     return null;
   }
 
-  // Get actual student data from AuthContext
-  const firstName = user?.fullName?.split(' ')[0] || 'Student';
+  const displayName = user?.fullName || 'Student';
   const classLevel = user?.classLevel || 'N/A';
   const studentId = user?.studentId || 'N/A';
 
@@ -52,7 +50,7 @@ export default function Dashboard() {
       progress: 60,
       route: '/chemistry'
     },
-        {
+    {
       id: 'biology', 
       name: 'Biology', 
       icon: Microscope,
@@ -68,73 +66,71 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen w-full bg-black text-white overflow-hidden">
-      {/* Top Navigation */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-lg border-b border-white/10">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
-               <span className="font-bold text-white text-sm">{firstName[0]}</span>
+          <div className="flex items-center gap-3">
+             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+               <span className="font-black text-white text-lg">{displayName[0]}</span>
              </div>
-             <span className="font-bold text-white tracking-wide">SHIKARA LAB</span>
+             <div>
+               <span className="font-black text-white tracking-tighter text-xl block leading-none">SHIKARA</span>
+               <span className="text-[10px] font-bold text-cyan-400 tracking-widest uppercase">Virtual Lab</span>
+             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             {isAdmin && (
               <button
                 onClick={() => navigate('/admin')}
-                className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-semibold flex items-center gap-2 hover:scale-105 transition-transform"
+                className="px-3 sm:px-5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs sm:text-sm font-bold flex items-center gap-2 hover:shadow-xl hover:shadow-purple-500/20 hover:-translate-y-0.5 transition-all"
               >
-                <Shield size={16} />
-                <span className="hidden sm:inline">Admin control</span>
+                <Shield size={16} className="text-purple-200" />
+                <span className="hidden md:inline">Admin Control</span>
               </button>
             )}
             <button
               onClick={handleLogout}
-              className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-300 text-sm font-semibold flex items-center gap-2 hover:bg-white/10 transition-colors"
+              className="px-3 sm:px-5 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-300 text-xs sm:text-sm font-bold flex items-center gap-2 hover:bg-white/10 hover:text-white transition-all"
             >
               <LogOut size={16} />
-              <span className="hidden sm:inline">Logout</span>
+              <span className="hidden md:inline">Logout</span>
             </button>
           </div>
         </div>
       </header>
 
-      {/* Animated gradient background */}
-      <div className="fixed inset-0 pointer-events-none opacity-30">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob"></div>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-cyan-500 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+      <div className="fixed inset-0 pointer-events-none opacity-20">
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-blue-600 rounded-full mix-blend-screen filter blur-[120px] opacity-20 animate-blob"></div>
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-600 rounded-full mix-blend-screen filter blur-[120px] opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-0 left-1/2 w-[500px] h-[500px] bg-cyan-600 rounded-full mix-blend-screen filter blur-[120px] opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
-      {/* Main Content */}
-      <div className="relative z-10 w-full px-4 sm:px-8 md:px-12 lg:px-[70px] py-8 pt-24 max-w-7xl mx-auto">
-        
-        {/* Hero Section */}
+      <div className="relative z-10 w-full px-4 sm:px-8 md:px-12 lg:px-[70px] py-8 pt-28 max-w-7xl mx-auto">
         <div className={`mb-12 transition-all duration-1000 ${animateLoad ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 mb-12">
-            {/* Main Welcome Card */}
-            <div className="relative rounded-3xl overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-600/20 via-blue-600/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="absolute inset-0 border border-cyan-500/20 group-hover:border-cyan-500/40 transition-colors duration-500 rounded-3xl"></div>
-              <div className="relative p-8 md:p-10 backdrop-blur-sm">
-                <div className="flex items-start justify-between mb-6">
-                  <div>
-                    <p className="text-sm font-medium text-cyan-400 mb-2">Welcome back</p>
-                    <h1 className="text-4xl md:text-5xl font-black text-white mb-2">
-                      {firstName} 
-                    </h1>
-                    <p className="text-lg text-gray-400">Class {classLevel} • ID: {studentId}</p>
+          <div className="relative rounded-[2rem] overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-600/10 via-transparent to-blue-600/10 backdrop-blur-md"></div>
+            <div className="absolute inset-0 border border-white/10 rounded-[2rem]"></div>
+            <div className="relative p-8 md:p-12">
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                    <p className="text-xs font-black text-cyan-400 uppercase tracking-[0.2em]">Welcome back, {displayName}</p>
                   </div>
-                  <div className="hidden md:block w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-500 opacity-20"></div>
+                  <h1 className="text-4xl md:text-6xl font-black text-white mb-4 tracking-tight leading-none">
+                    Ready to master your <br className="hidden sm:block" />
+                    <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">curriculum?</span>
+                  </h1>
+                  <p className="text-lg text-gray-400 font-medium">Class {classLevel} • Student ID: <span className="text-white">{studentId}</span></p>
                 </div>
-                <p className="text-gray-300 max-w-4xl leading-relaxed">
-                  Continue mastering your curriculum through interactive virtual experiments. You're on track to excel in your exams!
-                </p>
+                <div className="hidden md:block w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-500 opacity-20"></div>
               </div>
+              <p className="text-gray-300 max-w-4xl leading-relaxed">
+                Continue mastering your curriculum through interactive virtual experiments. You're on track to excel in your exams!
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Subject Cards Grid */}
         <div className={`mb-12 transition-all duration-1000 delay-200 ${animateLoad ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <div className="mb-8">
             <h2 className="text-2xl md:text-3xl font-black mb-2">Lab Sessions</h2>
@@ -148,24 +144,16 @@ export default function Dashboard() {
                 <Link
                   to={subject.route}
                   key={subject.id}
-                  className={`relative rounded-2xl overflow-hidden group cursor-pointer transform transition-all duration-500 ${
-                    animateLoad ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-                  }`}
+                  className="relative rounded-2xl overflow-hidden group cursor-pointer transform transition-all duration-500"
                   style={{ transitionDelay: `${300 + idx * 100}ms` }}
                 >
-                  {/* Background */}
                   <div className="absolute inset-0" style={{ background: subject.bgColor }}></div>
                   <div className="absolute inset-0 border rounded-2xl" style={{ borderColor: subject.borderColor }}></div>
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-                  {/* Content */}
                   <div className="relative p-6 h-full flex flex-col justify-between">
                     <div>
                       <div className="flex items-start justify-between mb-6">
                         <div>
-                          <h3 className={`text-2xl font-black mb-1 bg-gradient-to-r ${subject.color} bg-clip-text text-transparent`}>
-                            {subject.name}
-                          </h3>
+                          <h3 className={`text-2xl font-black mb-1 bg-gradient-to-r ${subject.color} bg-clip-text text-transparent`}>{subject.name}</h3>
                           <p className="text-sm text-gray-400">{subject.labs} Labs Available</p>
                         </div>
                         <div className={`p-3 rounded-xl bg-gradient-to-br ${subject.color} bg-clip-padding text-white/20`}>
@@ -173,26 +161,17 @@ export default function Dashboard() {
                         </div>
                       </div>
                     </div>
-
                     <div className="space-y-4">
-                      {/* Progress Bar */}
                       <div>
                         <div className="flex justify-between items-center mb-2">
                           <span className="text-xs font-bold text-gray-400">PROGRESS</span>
-                          <span className="text-xs font-bold" style={{ color: subject.accentColor }}>
-                            {subject.progress}%
-                          </span>
+                          <span className="text-xs font-bold" style={{ color: subject.accentColor }}>{subject.progress}%</span>
                         </div>
                         <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
-                          <div 
-                            className={`h-full bg-gradient-to-r ${subject.color} rounded-full transition-all duration-700`}
-                            style={{ width: `${subject.progress}%` }}
-                          ></div>
+                          <div className={`h-full bg-gradient-to-r ${subject.color} rounded-full`} style={{ width: `${subject.progress}%` }}></div>
                         </div>
                       </div>
-
-                      {/* CTA */}
-                      <div className="flex items-center gap-2 text-sm font-bold group-hover:translate-x-1 transition-transform duration-300" style={{ color: subject.accentColor }}>
+                      <div className="flex items-center gap-2 text-sm font-bold group-hover:translate-x-1 transition-transform" style={{ color: subject.accentColor }}>
                         <span>Explore Labs</span>
                         <ArrowRight size={16} />
                       </div>
@@ -204,7 +183,6 @@ export default function Dashboard() {
           </div>
         </div>
         
-        {/* Stats Footer */}
         <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 transition-all duration-1000 delay-500 ${animateLoad ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           {[
             { label: 'Total Hours', value: '48h', icon: Clock },
@@ -226,28 +204,13 @@ export default function Dashboard() {
 
       <style>{`
         @keyframes blob {
-          0%, 100% {
-            transform: translate(0, 0) scale(1);
-          }
-          33% {
-            transform: translate(30px, -50px) scale(1.1);
-          }
-          66% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          33% { transform: translate(30px, -50px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
         }
-
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
+        .animate-blob { animation: blob 7s infinite; }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
       `}</style>
     </div>
   );
